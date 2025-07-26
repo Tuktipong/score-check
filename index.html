@@ -279,11 +279,11 @@
                 </div>
                 <div class="stat-item">
                     <div class="stat-number" id="passCount">-</div>
-                    <div class="stat-label">ผ่าน (≥12)</div>
+                    <div class="stat-label">ผ่าน (≥10)</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number" id="failCount">-</div>
-                    <div class="stat-label">ไม่ผ่าน (<12)</div>
+                    <div class="stat-label">ไม่ผ่าน (<10)</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number" id="avgScore">-</div>
@@ -294,8 +294,8 @@
 
         <div class="grade-info">
             <h4>📋 เกณฑ์การให้คะแนน</h4>
-            <p><strong>ผ่าน:</strong> 12-20 คะแนน ✅</p>
-            <p><strong>ไม่ผ่าน:</strong> 0-11 คะแนน ❌</p>
+            <p><strong>ผ่าน:</strong> 10-20 คะแนน ✅</p>
+            <p><strong>ไม่ผ่าน:</strong> 0-9 คะแนน ❌</p>
             <p><strong>คะแนนเต็ม:</strong> 20 คะแนน</p>
         </div>
     </div>
@@ -358,7 +358,7 @@
             }
             
             const score = scores[studentNumber - 1];
-            const isPass = score >= 12;
+            const isPass = score >= 10;
             const percentage = Math.round((score / 20) * 100);
             
             if (isPass) {
@@ -387,7 +387,7 @@
                                 <strong>ผลการสอบ: ไม่ผ่าน ❌</strong>
                             </div>
                             <div style="font-size: 14px; margin-top: 8px; color: #666;">
-                                (ต้องได้ 12 คะแนนขึ้นไป)
+                                (ต้องได้ 10 คะแนนขึ้นไป)
                             </div>
                         </div>
                     </div>
@@ -403,7 +403,7 @@
             statsSection.style.display = 'block';
             statsTitle.textContent = `📊 สถิติคะแนนห้อง ${roomNumber}`;
             
-            const passCount = scores.filter(score => score >= 12).length;
+            const passCount = scores.filter(score => score >= 10).length;
             const failCount = scores.length - passCount;
             const totalScore = scores.reduce((sum, score) => sum + score, 0);
             const avgScore = (totalScore / scores.length).toFixed(1);
