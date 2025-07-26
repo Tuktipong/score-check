@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตรวจสอบคะแนนสอบกลางภาค</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        select:focus, input[type="number"]:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0,123,255,0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,123,255,0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            animation: slideUp 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .result-emoji {
+            font-size: 60px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .result-content {
+            flex: 1;
+            text-align: left;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pass {
+            background: linear-gradient(45deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+
+        .fail {
+            background: linear-gradient(45deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+
+        .error {
+            background: linear-gradient(45deg, #fff3cd, #ffeaa7);
+            color: #856404;
+            border: 2px solid #ffc107;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .error .result-emoji {
+            font-size: 40px;
+        }
+
+        .stats {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #007bff;
+        }
+
+        .stats h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .reset-btn {
+            background: linear-gradient(45deg, #6c757d, #495057);
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .reset-btn:hover {
+            box-shadow: 0 5px 15px rgba(108,117,125,0.4);
+        }
+
+        .grade-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .grade-info h4 {
+            margin-top: 0;
+            color: #495057;
+        }
+
+        .room-5 { border-color: #28a745; background-color: #e8f5e8; }
+        .room-15 { border-color: #ffc107; background-color: #fff8e1; }
+        .room-16 { border-color: #dc3545; background-color: #fde8e8; }
+
+        .result-emoji.celebrate {
+            animation: bounce 1s ease-in-out infinite alternate;
+        }
+        .result-emoji.sad {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-10px); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-emoji {
+                font-size: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 ตรวจสอบคะแนนสอบกลางภาค</h1>
+        
+        <div class="input-group">
+            <div class="input-row">
+                <div>
+                    <label for="roomSelect">เลือกห้องเรียน :</label>
+                    <select id="roomSelect" onchange="updateStudentCount()">
+                        <option value="">-- เลือกห้อง --</option>
+                        <option value="5">ห้อง 5</option>
+                        <option value="15">ห้อง 15</option>
+                        <option value="16">ห้อง 16</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="studentNumber">เลขที่นักเรียน :</label>
+                    <input type="number" id="studentNumber" min="1" placeholder="กรอกเลขที่" disabled>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="checkScore()" id="checkBtn" disabled>🔍 ตรวจสอบคะแนน</button>
+        <button class="reset-btn" onclick="resetForm()">🔄 เคลียร์ข้อมูล</button>
+        
+        <div id="result"></div>
+        
+        <div class="stats" id="statsSection" style="display: none;">
+            <h3 id="statsTitle">📊 สถิติคะแนน</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalStudents">-</div>
+                    <div class="stat-label">จำนวนนักเรียน</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="passCount">-</div>
+                    <div class="stat-label">ผ่าน (≥12)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="failCount">-</div>
+                    <div class="stat-label">ไม่ผ่าน (<12)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="avgScore">-</div>
+                    <div class="stat-label">คะแนนเฉลี่ย</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grade-info">
+            <h4>📋 เกณฑ์การให้คะแนน</h4>
+            <p><strong>ผ่าน:</strong> 12-20 คะแนน ✅</p>
+            <p><strong>ไม่ผ่าน:</strong> 0-11 คะแนน ❌</p>
+            <p><strong>คะแนนเต็ม:</strong> 20 คะแนน</p>
+        </div>
+    </div>
+
+    <script>
+        const roomScores = {
+            5: [16, 7, 13, 11, 15, 10, 14, 12, 12, 13, 14, 11, 12, 13, 13, 15, 15, 11, 9, 16, 12, 14, 14, 13, 15, 11, 13, 12, 15, 16, 11, 12, 15, 16, 12, 14, 10, 14, 9, 8, 13, 12],
+            15: [11, 7, 11, 11, 10, 9, 6, 9, 11, 7, 11, 10, 8, 14, 12, 14, 7, 14, 12, 10, 13, 11, 11, 12, 15, 8, 13, 10, 8, 9, 13, 9, 13, 5, 9, 13, 11, 11, 8, 11],
+            16: [8, 4, 5, 14, 6, 3, 12, 9, 10, 8, 10, 11, 8, 10, 11, 11, 9, 11, 12, 9, 14, 13, 13, 13, 12, 2, 8, 13, 9, 11, 13, 11, 13, 12, 10, 7, 7, 13, 12]
+        };
+
+        function updateStudentCount() {
+            const roomSelect = document.getElementById('roomSelect');
+            const studentNumberInput = document.getElementById('studentNumber');
+            const checkBtn = document.getElementById('checkBtn');
+            
+            if (roomSelect.value) {
+                const maxStudents = roomScores[roomSelect.value].length;
+                studentNumberInput.max = maxStudents;
+                studentNumberInput.placeholder = `1-${maxStudents}`;
+                studentNumberInput.disabled = false;
+                checkBtn.disabled = false;
+                studentNumberInput.focus();
+                
+                document.getElementById('result').innerHTML = '';
+                document.getElementById('statsSection').style.display = 'none';
+            } else {
+                studentNumberInput.disabled = true;
+                checkBtn.disabled = true;
+                studentNumberInput.placeholder = 'กรอกเลขที่';
+            }
+        }
+
+        function checkScore() {
+            const roomNumber = document.getElementById('roomSelect').value;
+            const studentNumber = document.getElementById('studentNumber').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!roomNumber) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <div class="result-emoji">⚠️</div>
+                        <div class="result-content">กรุณาเลือกห้องเรียนก่อน</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const scores = roomScores[roomNumber];
+            const maxStudents = scores.length;
+            
+            if (!studentNumber || studentNumber < 1 || studentNumber > maxStudents) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <div class="result-emoji">❌</div>
+                        <div class="result-content">กรุณากรอกเลขที่นักเรียน 1-${maxStudents} เท่านั้น</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const score = scores[studentNumber - 1];
+            const isPass = score >= 12;
+            const percentage = Math.round((score / 20) * 100);
+            
+            if (isPass) {
+                resultDiv.innerHTML = `
+                    <div class="result pass room-${roomNumber}">
+                        <div class="result-emoji celebrate">🎉</div>
+                        <div class="result-content">
+                            <div style="font-size: 22px; margin-bottom: 10px;"><strong>ยินดีด้วย!</strong></div>
+                            <div><strong>ห้อง: ${roomNumber} | เลขที่: ${studentNumber}</strong></div>
+                            <div>คะแนน: ${score}/20 คะแนน (${percentage}%)</div>
+                            <div style="color: #28a745; font-size: 20px; margin-top: 5px;">
+                                <strong>ผลการสอบ: ผ่าน ✅</strong>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="result fail room-${roomNumber}">
+                        <div class="result-emoji sad">😞</div>
+                        <div class="result-content">
+                            <div style="font-size: 22px; margin-bottom: 10px;"><strong>เสียใจด้วย</strong></div>
+                            <div><strong>ห้อง: ${roomNumber} | เลขที่: ${studentNumber}</strong></div>
+                            <div>คะแนน: ${score}/20 คะแนน (${percentage}%)</div>
+                            <div style="color: #dc3545; font-size: 20px; margin-top: 5px;">
+                                <strong>ผลการสอบ: ไม่ผ่าน ❌</strong>
+                            </div>
+                            <div style="font-size: 14px; margin-top: 8px; color: #666;">
+                                (ต้องได้ 12 คะแนนขึ้นไป)
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            showStats(roomNumber, scores);
+        }
+
+        function showStats(roomNumber, scores) {
+            const statsSection = document.getElementById('statsSection');
+            const statsTitle = document.getElementById('statsTitle');
+            statsSection.style.display = 'block';
+            statsTitle.textContent = `📊 สถิติคะแนนห้อง ${roomNumber}`;
+            
+            const passCount = scores.filter(score => score >= 12).length;
+            const failCount = scores.length - passCount;
+            const totalScore = scores.reduce((sum, score) => sum + score, 0);
+            const avgScore = (totalScore / scores.length).toFixed(1);
+            const passPercentage = Math.round((passCount / scores.length) * 100);
+            
+            document.getElementById('totalStudents').textContent = scores.length;
+            document.getElementById('passCount').textContent = `${passCount} (${passPercentage}%)`;
+            document.getElementById('failCount').textContent = `${failCount} (${100-passPercentage}%)`;
+            document.getElementById('avgScore').textContent = avgScore;
+        }
+
+        function resetForm() {
+            document.getElementById('roomSelect').value = '';
+            document.getElementById('studentNumber').value = '';
+            document.getElementById('studentNumber').disabled = true;
+            document.getElementById('checkBtn').disabled = true;
+            document.getElementById('result').innerHTML = '';
+            document.getElementById('statsSection').style.display = 'none';
+            document.getElementById('roomSelect').focus();
+        }
+
+        document.getElementById('studentNumber').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                checkScore();
+            }
+        });
+
+        window.onload = function() {
+            document.getElementById('roomSelect').focus();
+        };
+    </script>
+</body>
+</html>
